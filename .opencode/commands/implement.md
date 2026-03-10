@@ -1,6 +1,5 @@
 ---
 description: "FIC Phase 3 — Implement a plan phase by phase. Runs isolated. Usage: /implement thoughts/plans/[plan-doc].md [optional: 'phase N only']"
-subtask: true
 agent: build
 ---
 You are in FIC Phase 3: Implementation.
