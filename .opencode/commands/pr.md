@@ -1,0 +1,37 @@
+---
+description: "Generate a pull request description from recent commits and plan doc. Usage: /pr [optional: path to plan doc]"
+agent: build
+---
+Generate a pull request description for the current branch.
+
+## Process
+
+1. Run `git log main..HEAD --oneline` (or `git log origin/main..HEAD --oneline`) to see commits
+2. Run `git diff main..HEAD --stat` to see files changed
+3. If a plan doc path is provided ($ARGUMENTS), read it for context on the goal and phases
+4. Generate a PR description with this structure:
+
+```markdown
+## Summary
+[2-3 sentences: what this PR does and why]
+
+## Changes
+- [High-level bullet of significant changes]
+- [Not a commit list — grouped by concern]
+
+## Testing
+- [ ] Automated tests pass (`[test command]`)
+- [ ] [Manual verification step 1]
+- [ ] [Manual verification step 2]
+
+## Related
+[Issue numbers, plan doc path, research doc path if relevant]
+```
+
+5. Show the description and ask for approval or edits
+
+## Rules
+- Write for a human reviewer who hasn't seen the work
+- Focus on WHY, not just what changed
+- Keep summary to 2-3 sentences
+- Testing section should be genuinely useful, not boilerplate

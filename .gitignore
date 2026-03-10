@@ -1,0 +1,6 @@
+# FIC thoughts directory — keep out of git
+# These are working artifacts, not source of truth
+thoughts/
+
+# OpenCode local config (keep .opencode/ in git, but not local overrides)
+.opencode/local.json
