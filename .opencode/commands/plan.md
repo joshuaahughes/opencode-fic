@@ -1,67 +1,108 @@
 ---
-description: "FIC Phase 2 — Create implementation plan from a research doc. Runs isolated. Usage: /plan thoughts/research/[research-doc].md"
+description: "FIC Phase 2 — Create or continue an implementation plan. Usage: /plan thoughts/research/[research-doc].md OR /plan thoughts/plans/[existing-plan].md"
 subtask: true
 agent: planner
 ---
 You are in FIC Phase 2: Planning.
 
-Research document: $ARGUMENTS
+Argument: $ARGUMENTS
 
-## Your Instructions
+## Step 1: Detect mode
 
-Read the research document at the path above. Then create a precise,
-phased implementation plan.
+First, determine what was passed in `$ARGUMENTS`:
 
-## Process
+### Case A — A research doc was passed (path contains `/research/`)
+Derive the plan doc path:
+- Extract the slug from the research filename (strip date prefix and `-research` suffix)
+- Plan path = `thoughts/plans/YYYY-MM-DD_[slug]-plan.md` (use today's date and relevant key terms)
+- Check if that plan file already exists with `ls thoughts/plans/`
 
-1. Read the research doc fully
-2. Identify any gaps or ambiguities — list them as open questions
-3. Share your open questions AND a rough phase outline with the user BEFORE writing the plan
-4. Incorporate feedback, then write the final plan doc
+  **If plan file does NOT exist yet → go to Step 2 (Create Draft)**
+  **If plan file already exists → go to Step 3 (Continue Draft)**
 
-Work back and forth with me, sharing your open questions and phases outline
-before writing the plan.
+### Case B — A plan doc was passed directly (path contains `/plans/`)
+The plan file already exists. Go to Step 3 (Continue Draft).
 
-## Output Format
+---
 
-Write the plan to `thoughts/plans/` using filename format:
-`YYYY-MM-DD_[short-topic-slug]-plan.md`
+## Step 2: Create Draft (first run)
 
-Structure the plan doc as:
-```
+The plan file does not exist yet. Do this immediately — do not ask questions first:
+
+1. Read the research doc at `$ARGUMENTS`
+2. Write a draft plan file to `thoughts/plans/` right now with this structure:
+
+```markdown
+# Plan: [topic]
+
+## Status: DRAFT — needs review
+## Research doc: $ARGUMENTS
+## Started: [today's date]
+
 ## Goal
-[1 sentence: what does success look like]
+[1 sentence from the research doc's recommended approach]
 
-## Context
-Research doc: [path to research doc]
-Started: [date]
+## Open Questions
+> These must be answered before this plan is finalised.
+> Answer them by editing this section, then re-run /plan on this file.
 
-## Phases
+- [ ] Q1: [first thing you need clarified]
+- [ ] Q2: [second thing you need clarified]
 
-### Phase 1: [Descriptive Name]
-- [ ] Step 1 — File: `src/foo.ts`, Function: `handleX()`, Change: [precise description]
-- [ ] Step 2 — File: `src/bar.ts`, Add: [precise description]
-- Automated verification: `npm test src/foo.test.ts`
-- Manual verification: [what to check by hand]
+## Phase Outline (draft)
+> Rough shape only — steps will be filled in once open questions are answered.
 
-### Phase 2: [Descriptive Name]
-- [ ] Step 1 — ...
-- Automated verification: ...
-- Manual verification: ...
+### Phase 1: [Name] — [1-sentence goal]
+### Phase 2: [Name] — [1-sentence goal]
 
-## Risks and Open Questions
-[Anything that could go wrong or needs human decision]
+## Phases (to be filled in)
+[empty until open questions are resolved]
+
+## Risks
+[anything that could go wrong]
 
 ## Out of Scope
-[Explicitly list what this plan does NOT cover]
-
-## Progress
-[Leave blank — filled in during implementation]
+[explicit exclusions]
 ```
 
+3. After writing the file, tell the user:
+   - The path to the draft plan file
+   - The open questions that need answers
+   - How to continue: "Answer the questions by editing the plan file directly, then run `/plan thoughts/plans/[filename].md` to continue."
+
+**Stop here. Do not ask questions in chat. The file is now the conversation.**
+
+---
+
+## Step 3: Continue Draft (subsequent runs)
+
+The plan file exists. Read it now.
+
+Check the `## Open Questions` section:
+
+### If open questions remain (any `- [ ]` items):
+- Read all unanswered questions
+- Check if any answers were added to the file since last run (look for text after the question)
+- For any questions that now have answers: acknowledge them and mark as `- [x]`
+- For any still-unanswered questions: remind the user what's needed
+- If ALL questions are answered: proceed to finalise the plan (below)
+- If questions remain: tell the user what's still needed and stop
+
+### If all open questions are answered (all `- [x]` or section is empty):
+Finalise the plan:
+1. Read the research doc again for reference
+2. Fill in the `## Phases` section with precise steps:
+   - Each step: `File: path/to/file.ts, Function: name(), Change: [exact description]`
+   - Each phase: automated verification command + manual verification checklist
+3. Update `## Status` to `READY FOR REVIEW`
+4. Save the file
+5. Tell the user the plan is ready and ask them to review before running `/implement`
+
+---
+
 ## Hard Rules
-- Do NOT write any code
-- Do NOT make file edits
-- Each step must reference exact files and functions
-- Every phase must include both automated and manual verification steps
-- When done, tell the user the path to the plan doc and ask them to review and approve it before proceeding to /implement
+- NEVER write code
+- NEVER edit source files (only write to `thoughts/plans/`)
+- The plan file is the source of truth — all state lives there, not in chat
+- If uncertain about anything, add it as an open question in the file
+- Precise steps beat vague steps: "modify `refreshToken()` at line 45 to add retry logic" not "update auth"
