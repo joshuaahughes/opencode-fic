@@ -20,7 +20,7 @@ Or copy the contents manually.
   opencode.json              — agent permissions and config wiring
   agents/
     researcher.md            — read-only Phase 1 researcher subagent
-    planner.md               — read-only Phase 2 planner subagent
+    planner.md               — Phase 2 planner (primary agent)
   commands/
     research.md              — /research [topic]
     plan.md                  — /plan [research-doc]
@@ -53,6 +53,14 @@ state into markdown files so each phase starts with a clean, correctly-scoped co
 
 Review the 400-line research+plan artifacts, not the 2000-line generated code.
 
+### Recommended Session Flow
+
+1. **Research phase** — Run `/research [topic]` in the default build agent
+2. **Planning phase** — Switch to the planner agent, then run `/plan thoughts/research/[research-doc].md` (can be same session, but recommended to run `/new` for fresh context)
+3. **Implementation phase** — Create a new session, then run `/implement thoughts/plans/[plan-doc].md` in the build agent
+
+Starting a new session before `/plan` and `/implement` keeps context fresh and avoids hitting the 60% context limit.
+
 ### Phase 1: Research
 ```
 /research fix the payment retry bug
@@ -65,7 +73,8 @@ Produces `thoughts/research/YYYY-MM-DD_[topic]-research.md`.
 ```
 /plan thoughts/research/2025-01-15_payment-retry-research.md
 ```
-Runs in an isolated planner subagent. Reads your research doc, asks clarifying
+Runs in the planner agent (a primary agent in OpenCode — not the build agent).
+Reads your research doc, asks clarifying
 questions, then produces `thoughts/plans/YYYY-MM-DD_[topic]-plan.md`.
 **Review and approve the plan before implementing.**
 
