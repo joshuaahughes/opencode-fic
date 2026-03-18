@@ -1,5 +1,7 @@
 # OpenCode FIC Infrastructure
 
+![alt text](image.png)
+
 Frequent Intentional Compaction workflow for OpenCode — structured context engineering
 for AI coding agents tackling hard problems in complex codebases. Based on Ideas and philosophy from HumanLayer/CodeLayer. A simple implementation to easily plug right into OpenCode Projects.
 
