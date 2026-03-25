@@ -1,9 +1,8 @@
-# OpenCode FIC Infrastructure
+# FIC Infrastructure
 
 ![alt text](image.png)
 
-Frequent Intentional Compaction workflow for OpenCode — structured context engineering
-for AI coding agents tackling hard problems in complex codebases. Based on Ideas and philosophy from HumanLayer/CodeLayer. A simple implementation to easily plug right into OpenCode Projects.
+Frequent Intentional Compaction workflow for AI coding agents — structured context engineering for tackling hard problems in complex codebases. Works with **OpenCode** or **Gemini CLI**. Based on ideas and philosophy from HumanLayer/CodeLayer.
 
 ## Install into your project
 
@@ -13,13 +12,21 @@ cd opencode-fic
 ./setup-fic.sh /path/to/your/project
 ```
 
-Or copy the contents manually.
+### CLI Options
+
+```bash
+./setup-fic.sh /path/to/project           # Install both OpenCode & Gemini CLI configs
+./setup-fic.sh /path/to/project --opencode   # OpenCode only
+./setup-fic.sh /path/to/project --gemini     # Gemini CLI only
+./setup-fic.sh /path/to/project --both       # Both (default)
+```
 
 ## What's included
 
+### OpenCode Config (`.opencode/`)
 ```
 .opencode/
-  opencode.json              — agent permissions and config wiring
+  opencode.json              — agent permissions and config
   agents/
     researcher.md            — read-only Phase 1 researcher subagent
     planner.md               — Phase 2 planner (primary agent)
@@ -31,14 +38,36 @@ Or copy the contents manually.
     commit.md                — /commit
     pr.md                    — /pr [plan-doc]
   skills/
-    fic-workflow/SKILL.md    — full FIC methodology reference (loaded on demand)
+    fic-workflow/SKILL.md    — full FIC methodology reference
+```
 
+### Gemini CLI Config (`.gemini/`)
+```
+.gemini/
+  settings.json              — context file config
+  agents/
+    researcher.md            — read-only Phase 1 researcher agent
+    planner.md               — Phase 2 planner agent
+  commands/
+    research.toml            — /research [topic]
+    plan.toml                — /plan [research-doc]
+    implement.toml           — /implement [plan-doc]
+    checkpoint.toml          — /checkpoint [topic]
+    git/commit.toml          — /git:commit
+    pr.toml                  — /pr [plan-doc]
+  skills/
+    fic-workflow/SKILL.md    — full FIC methodology reference
+```
+
+### Shared
+```
 agent_docs/                  — fill these in for your project
   architecture.md
   testing.md
   conventions.md
 
-AGENTS.md                    — lean root config (fill in your project details)
+AGENTS.md (OpenCode)        — root context file
+GEMINI.md (Gemini CLI)      — root context file
 thoughts/ → ~/thoughts/<project>  — research/plan/progress artifacts (gitignored)
 ```
 
@@ -64,33 +93,64 @@ Review the 400-line research+plan artifacts, not the 2000-line generated code.
 Starting a new session before `/plan` and `/implement` keeps context fresh and avoids hitting the 60% context limit.
 
 ### Phase 1: Research
+
+**OpenCode:**
 ```
 /research fix the payment retry bug
 ```
-Runs in an isolated researcher subagent. Uses `@explore` for all file reads.
+
+**Gemini CLI:**
+```
+/research fix the payment retry bug
+```
+
+Runs in an isolated researcher subagent. Uses subagents for all file reads.
 Produces `thoughts/research/YYYY-MM-DD_[topic]-research.md`.
 **Review the doc before proceeding.**
 
 ### Phase 2: Plan
+
+**OpenCode:**
 ```
 /plan thoughts/research/2025-01-15_payment-retry-research.md
 ```
-Runs in the planner agent (a primary agent in OpenCode — not the build agent).
-Reads your research doc, asks clarifying
+
+**Gemini CLI:**
+```
+/plan thoughts/research/2025-01-15_payment-retry-research.md
+```
+
+Runs in the planner agent. Reads your research doc, asks clarifying
 questions, then produces `thoughts/plans/YYYY-MM-DD_[topic]-plan.md`.
 **Review and approve the plan before implementing.**
 
 ### Phase 3: Implement
+
+**OpenCode:**
 ```
 /implement thoughts/plans/2025-01-15_payment-retry-plan.md
 ```
+
+**Gemini CLI:**
+```
+/implement thoughts/plans/2025-01-15_payment-retry-plan.md
+```
+
 Runs in build agent. Executes phase by phase, runs tests, waits for your
 manual verification between phases. Updates checkboxes in the plan as it goes.
 
 ### Pause and resume
+
+**OpenCode:**
 ```
 /checkpoint payment-retry
 ```
+
+**Gemini CLI:**
+```
+/checkpoint payment-retry
+```
+
 Saves full session state to `thoughts/progress/payment-retry-progress.md`.
 Start a new session and resume with:
 ```
@@ -100,8 +160,16 @@ phase 1 is done, start phase 2]
 ```
 
 ### Finishing up
+
+**OpenCode:**
 ```
 /commit
+/pr thoughts/plans/payment-retry-plan.md
+```
+
+**Gemini CLI:**
+```
+/git:commit
 /pr thoughts/plans/payment-retry-plan.md
 ```
 
@@ -109,12 +177,12 @@ phase 1 is done, start phase 2]
 
 After running `setup-fic.sh`:
 
-- [ ] Edit `AGENTS.md` — fill in What, Stack, and test commands
+- [ ] Edit `AGENTS.md` (OpenCode) and/or `GEMINI.md` (Gemini CLI) — fill in What, Stack, and test commands
 - [ ] Edit `agent_docs/architecture.md` — map your codebase
 - [ ] Edit `agent_docs/testing.md` — real test commands
 - [ ] Edit `agent_docs/conventions.md` — real patterns
-- [ ] Review `.opencode/opencode.json` — adjust test commands in bash permissions
-- [ ] Optionally set model overrides per agent in `opencode.json`
+- [ ] Review `.opencode/opencode.json` — adjust test commands in bash permissions (OpenCode only)
+- [ ] Review `.gemini/settings.json` — adjust context settings (Gemini CLI only)
 
 ## Key rules to internalize
 

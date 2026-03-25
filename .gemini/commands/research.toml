@@ -1,0 +1,49 @@
+description = "FIC Phase 1 — Research codebase for an issue. Runs isolated. Writes research doc to thoughts/research/. Usage: /research [topic]"
+prompt = """You are in FIC Phase 1: Research.
+
+Task: {{args}}
+
+## Your Instructions
+
+Research the codebase to understand the issue or topic above.
+
+Use subagents for all file operations (glob, grep, read). Do not read files
+directly into this context — delegate to subagents and receive
+only compacted summaries back.
+
+## Output Format
+
+Write your findings to `thoughts/research/` using filename format:
+`YYYY-MM-DD_[short-topic-slug]-research.md`
+
+Structure the research doc as:
+```
+## Problem Summary
+[2-3 sentences: what is the issue and why does it matter]
+
+## Relevant Files
+[List with exact line numbers and 1-line description of relevance]
+- src/foo/bar.ts:45-89 — handles X
+- src/baz/qux.ts:12 — entry point for Y
+
+## Information Flow
+[Trace how data/calls flow through the system relevant to this issue]
+e.g. userRequest() → validateInput() → processPayment() → recordTransaction()
+
+## Key Findings
+[Bullet list of what you discovered — facts only, no solutions]
+
+## Open Questions
+[Things that need human clarification before planning]
+
+## Recommended Approach
+[1 paragraph only — high-level direction, not implementation steps]
+```
+
+## Hard Rules
+- Do NOT write any code
+- Do NOT make an implementation plan or explain how to fix
+- Do NOT read large files whole — use targeted searches
+- Keep output under 200 lines
+- When done, tell the user the path to the research doc and ask them to review it before proceeding to /plan
+"""

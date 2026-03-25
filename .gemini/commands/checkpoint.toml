@@ -1,0 +1,45 @@
+description = "Save current session state to a progress doc so it can be resumed in a fresh context. Usage: /checkpoint [topic]"
+prompt = """You are approaching context limits or pausing work. Save the current session state
+so it can be resumed cleanly in a new session.
+
+Topic: {{args}}
+
+## Process
+
+1. Review the conversation so far and the current state of any plan/progress docs
+2. Write or update `thoughts/progress/{{args}}-progress.md` with:
+
+```
+## Goal
+[What we are ultimately trying to achieve]
+
+## Plan Doc
+[Path to the plan doc, if any]
+
+## Session Summary
+[3-5 sentences: what was attempted and what was learned]
+
+## Completed Steps
+- [✓] [Step description] — [brief note on outcome]
+
+## Current Step
+- [→] [Exactly what step is in progress and where it was left off]
+  - Last action taken: [specific file/function touched]
+  - Current blocker or decision point: [if any]
+
+## Remaining Steps
+- [ ] [Step]
+- [ ] [Step]
+
+## Divergences from Plan
+- [Any ways reality differed from the plan — important context for next session]
+
+## To Resume
+[Exact instructions for how to pick this up in a new session, e.g.:
+"Start new session, run /implement thoughts/plans/foo-plan.md, tell it
+phase 1 is done and to start phase 2. Read this progress doc first."]
+```
+
+3. Confirm the progress doc is saved and give the user the resume instructions
+4. Remind the user to start a FRESH session to continue — do not continue in this one
+"""
